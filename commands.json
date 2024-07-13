@@ -1,0 +1,8 @@
+{
+    "commands": {
+        "p":  ["print", "pause", "paste"],
+        "c":  ["copy", "cancle", "continue"],
+        "r":  ["resume", "return"],
+        "b":  ["back"]
+    }
+}

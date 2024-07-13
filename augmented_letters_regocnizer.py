@@ -9,6 +9,7 @@ import numpy as np
 import pyautogui
 import math
 import sys
+import json
 
 screen_width, screen_height = pyautogui.size()
 
@@ -23,6 +24,8 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 START_DRAW_THRESHOLD = 40
 END_DRAW_THRESHOLD = 80
 TIME_INTERVAL = 0.05
+TOLERANCE = 50
+COMMANDS = json.load(open('commands.json')) 
 
 video_id = 0
 if len(sys.argv) > 1:
@@ -33,6 +36,10 @@ class LetterDrawer():
         self.cap = cv2.VideoCapture(video_id) 
         self.gesture_being_drawn = False
         self.line_points = []
+        self.last_mouse_x = 0
+        self.last_mouse_y = 0
+        self.time_since_last_point = np.inf
+        self.menu_opened = False
         self.running = True
         self.dimensions = (screen_height, screen_width, 3) #set size to screen size to avoid mapping
         self.options = HandLandmarkerOptions(
@@ -71,7 +78,6 @@ class LetterDrawer():
         y_position_hand = hand_landmark.y * screen_height
         distance = self.get_distance(x_position_thumb, y_position_thumb, x_position_index, y_position_index)
         if(not self.gesture_being_drawn and distance <= START_DRAW_THRESHOLD):
-            (x_position_hand, y_position_hand)
             self.gesture_being_drawn = True
             print("Gesture started")
         elif self.gesture_being_drawn and distance > END_DRAW_THRESHOLD:
@@ -105,7 +111,19 @@ class LetterDrawer():
         if self.gesture_being_drawn:
             x_position_hand = hand_landmark.x * screen_width
             y_position_hand = hand_landmark.y * screen_height
-            self.line_points.append((x_position_hand, y_position_hand))
+            # Check if the hand is moving
+            # If the hand is not moving with a small tolerance and a timer, open the command menu
+            if (abs(self.last_mouse_x - x_position_hand) < TOLERANCE and abs(self.last_mouse_y - y_position_hand) < TOLERANCE):
+                if time.time() - self.time_since_last_point > 0.5:
+                    if not self.menu_opened:
+                        self.open_command_menu("p", x_position_hand, y_position_hand)
+            # If the hand is moving, add the new point to the line
+            else:
+                self.menu_opened = False
+                self.last_mouse_x = x_position_hand
+                self.last_mouse_y = y_position_hand
+                self.line_points.append((x_position_hand, y_position_hand))
+                self.time_since_last_point = time.time()
 
     def draw_line(self):
         if len(self.line_points) > 1:
@@ -113,6 +131,13 @@ class LetterDrawer():
                 x1, y1 = self.line_points[i - 1]
                 x2, y2 = self.line_points[i]
                 canvas.create_line(x1, y1, x2, y2, fill='black', width=5)
+
+    def open_command_menu(self, detected_character, x, y):
+        print("Open command menu")
+        commands = COMMANDS[detected_character]
+        for i in range(len(commands)):
+            canvas.create_text(x, y + i * 20, text=commands[i], font=('Helvetica', 12), fill='black')
+        self.menu_opened = True
 
 def make_window_click_through(hwnd):
     style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
