@@ -10,7 +10,7 @@ import pyautogui
 import math
 import sys
 import json
-
+from dollar_recognizer import DollarRecognizer, Point  # Import DollarRecognizer and Point
 screen_width, screen_height = pyautogui.size()
 
 model_path = 'hand_landmarker.task'
@@ -27,7 +27,7 @@ TIME_INTERVAL = 0.01
 TOLERANCE = 50
 COMMANDS = json.load(open('commands.json')) 
 
-video_id = 0
+video_id = 1
 if len(sys.argv) > 1:
     video_id = int(sys.argv[1])
 
@@ -38,7 +38,7 @@ class HandDetector(QThread):
     add_line_point_signal = pyqtSignal(object)  # Assuming hand_landmark is an object
     draw_line_signal = pyqtSignal()
     set_gesture_being_drawn_signal = pyqtSignal(bool)
-
+    gesture_recognized_signal = pyqtSignal(str, float)  # signal for gesture recognition
     def __init__(self):
         super().__init__()
         self.options = HandLandmarkerOptions(
@@ -49,6 +49,11 @@ class HandDetector(QThread):
         self.dimensions = (screen_height, screen_width, 3) #set size to screen size to avoid mapping
         self.gesture_being_drawn = False
         self.time_since_last_detection = np.inf
+        self.line_points = []  # To store points for gesture recognition
+
+        # Init Dollar Recognizer
+        self.recognizer = DollarRecognizer()
+        self.recognizer.load_unistrokes_from_xml()
 
     def run(self):
         with HandLandmarker.create_from_options(self.options) as landmarker:
@@ -69,28 +74,33 @@ class HandDetector(QThread):
             self.over_threshold_counter = 0
 
         x_position_thumb = thumb_landmark.x * screen_width
-        y_position_thumb = thumb_landmark.y * screen_height
+        y_position_thumb = (1 - thumb_landmark.y) * screen_height  # Flip y-coordinate
         x_position_index = index_landmark.x * screen_width
-        y_position_index = index_landmark.y * screen_height
+        y_position_index = (1 - index_landmark.y) * screen_height  # Flip y-coordinate
         distance = self.get_distance(x_position_thumb, y_position_thumb, x_position_index, y_position_index)
-        print(distance)
+        #print(distance)
 
         if not self.gesture_being_drawn and distance <= START_DRAW_THRESHOLD:
             print("Gesture started")
             self.gesture_being_drawn = True
             self.over_threshold_counter = 0  # Reset counter when gesture starts
+            self.line_points = []
         elif self.gesture_being_drawn:
             if distance > END_DRAW_THRESHOLD:
                 self.over_threshold_counter += 1  # Increment counter if over threshold
                 if self.over_threshold_counter >= 5:  # Check if counter has reached 5
                     print("Gesture ended")
-                    self.clear_scene_signal.emit()
                     self.gesture_being_drawn = False
                     self.over_threshold_counter = 0  # Reset counter after gesture ends
+                    self.clear_scene_signal.emit()
+                    recognized_result = self.recognizer.Recognize([Point(p[0], p[1]) for p in self.line_points])
+                    self.gesture_recognized_signal.emit(recognized_result.Name, recognized_result.Score)
             else:
                 self.over_threshold_counter = 0  # Reset counter if distance is not over threshold
 
         if self.gesture_being_drawn:
+            self.line_points.append(
+                (hand_landmark.x * screen_width, (1 - hand_landmark.y) * screen_height))  # Flip y-coordinate
             self.add_line_point_signal.emit(hand_landmark)
             self.draw_line_signal.emit()
 
@@ -152,6 +162,7 @@ class LetterDrawer(QMainWindow):
         self.hand_detector.clear_scene_signal.connect(self.clear_scene)
         self.hand_detector.add_line_point_signal.connect(self.try_add_line_point)
         self.hand_detector.draw_line_signal.connect(self.draw_line)
+        self.hand_detector.gesture_recognized_signal.connect(self.on_gesture_recognized)  # handle recognized gestures
         self.hand_detector.finished.connect(self.hand_detector.deleteLater)
         self.hand_detector.start()
 
@@ -184,6 +195,11 @@ class LetterDrawer(QMainWindow):
                 x2, y2 = self.line_points[i]
                 self.scene.addLine(x1, y1, x2, y2, self.pen)
                 self.view.update()
+
+    def on_gesture_recognized(self, gesture_name, score):
+        print(f"Gesture recognized: {gesture_name} with score: {score}")
+        self.open_command_menu(gesture_name, self.last_mouse_x, self.last_mouse_y)
+
 
     def open_command_menu(self, detected_character, x, y):
         print("Open command menu")
