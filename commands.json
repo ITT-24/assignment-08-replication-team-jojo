@@ -1,8 +1,23 @@
 {
     "commands": {
-        "p":  ["print", "pause", "paste"],
-        "c":  ["copy", "cancle", "continue"],
-        "r":  ["resume", "return"],
-        "b":  ["back"]
+      "a": [
+        {"command": "all-select", "shortcut": "ctrl+a"},
+        {"command": "align", "shortcut": "ctrl+shift+a"},
+        {"command": "annotate", "shortcut": "alt+a"},
+        {"command": "activate", "shortcut": "ctrl+alt+a"}
+      ],
+      "c": [
+        {"command": "copy", "shortcut": "ctrl+c"},
+        
+        {"command": "cut", "shortcut": "ctrl+x"}
+      ],
+      "p": [
+        {"command": "paste", "shortcut": "ctrl+v"},
+        {"command": "print", "shortcut": "ctrl+p"}
+      ],
+      "s": [
+        {"command": "save", "shortcut": "ctrl+s"},
+        {"command": "save-as", "shortcut": "ctrl+shift+s"}
+      ]
     }
-}
+  }
