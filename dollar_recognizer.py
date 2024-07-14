@@ -221,6 +221,8 @@ class DollarRecognizer:
         print(f'loaded {len(self.Unistrokes)} gestures')
 
     def Recognize(self, points):
+        for i in range(len(points)):
+            points[i] = Point(points[i].X, 1-points[i].Y)
         t = time.time()
         gesture = Gesture('', points)
         b = float('inf')

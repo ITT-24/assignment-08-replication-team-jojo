@@ -52,7 +52,6 @@ class HandDetector(QThread):
         self.dimensions = (screen_height, screen_width, 3) #set size to screen size to avoid mapping
         self.gesture_being_drawn = False
         self.time_since_last_detection = np.inf
-        self.line_points = []  # To store points for gesture recognition
 
     def run(self):
         with HandLandmarker.create_from_options(self.options) as landmarker:
@@ -81,7 +80,6 @@ class HandDetector(QThread):
             print("Gesture started")
             self.gesture_being_drawn = True
             self.over_threshold_counter = 0  # Reset counter when gesture starts
-            self.line_points = []
         elif self.gesture_being_drawn:
             if distance > END_DRAW_THRESHOLD:
                 self.over_threshold_counter += 1  # Increment counter if over threshold
@@ -94,8 +92,6 @@ class HandDetector(QThread):
                 self.over_threshold_counter = 0  # Reset counter if distance is not over threshold
 
         if self.gesture_being_drawn:
-            self.line_points.append(
-                (hand_landmark.x * screen_width, (1 - hand_landmark.y) * screen_height))  # Flip y-coordinate
             self.add_line_point_signal.emit(hand_landmark)
             self.draw_line_signal.emit()
 
