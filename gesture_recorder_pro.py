@@ -25,8 +25,8 @@ AngleRange = math.radians(45.0) / 180
 AnglePrecision = math.radians(2.0) / 180
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-gesture_name = "o"  # Initial gesture name
-xml_filepath = 'xml_logs2'
+gesture_name = "a"  # Initial gesture name
+xml_filepath = 'xml_logs_pro'
 
 # Helper functions for gesture recognition
 def PathLength(points):
@@ -241,7 +241,7 @@ class DollarRecognizer:
             return Result(self.Unistrokes[u].name, 1.0 - b / HalfDiagonal, ts-t)
 
 # Function to save gestures to XML
-def save_gesture_to_xml(points, name, directory='xml_logs2'):
+def save_gesture_to_xml(points, name, directory='xml_logs_pro'):
     if not os.path.exists(directory):
         os.makedirs(directory)
     index = 1
