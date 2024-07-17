@@ -13,7 +13,7 @@ Unistroke characters Design Patterns used, then recorded ourselves, pro mode pat
 
 Quick use guide:
 
-start  augmented_letter_recognizer_novice.py (change video ID if needed) By pinching your thumb and index finger in front of the webcam draw a letter following the diagram above, at the end dont move oyur hand till a menu pops up where oyu can select the whished shortcut.
+start  augmented_letter_recognizer_novice.py (change video ID if needed) By pinching your thumb and index finger in front of the webcam draw a letter following the diagram above, at the end dont move your hand till a menu pops up where you can select the wanted shortcut.
 you can add your own shortcuts in the commands.json
 once you are familiar with the letter + tail use the pro mode as it is faster. 
 
