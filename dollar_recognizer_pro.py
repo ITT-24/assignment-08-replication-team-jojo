@@ -24,7 +24,7 @@ Diagonal = math.sqrt(SquareSize**2 + SquareSize**2)
 HalfDiagonal = 0.5 * Diagonal
 AngleRange = math.radians(45.0) / 180
 AnglePrecision = math.radians(2.0) / 180
-xml_filepath = 'xml_logs2'
+xml_filepath = 'xml_logs_pro'
 
 
 # Helper functions for gesture recognition

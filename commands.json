@@ -8,8 +8,11 @@
       ],
       "c": [
         {"command": "copy", "shortcut": "ctrl+c"},
-        
         {"command": "cut", "shortcut": "ctrl+x"}
+      ],
+            "d": [
+        {"command": "desktop", "shortcut": "win+d"},
+        {"command": "new-virtual-desktop", "shortcut": "win+ctrl+d"}
       ],
       "p": [
         {"command": "paste", "shortcut": "ctrl+v"},
@@ -18,6 +21,11 @@
       "s": [
         {"command": "save", "shortcut": "ctrl+s"},
         {"command": "save-as", "shortcut": "ctrl+shift+s"}
+      ],
+            "n": [
+        {"command": "new-tab", "shortcut": "ctrl+t"},
+        {"command": "new-incognite-window", "shortcut": "ctrl+shift+n"},
+        {"command": "new-window", "shortcut": "ctrl+n"}
       ]
     }
   }

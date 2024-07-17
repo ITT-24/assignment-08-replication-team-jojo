@@ -15,6 +15,12 @@ Point = namedtuple('Point', 'X Y')
 Rectangle = namedtuple('Rectangle', 'X Y Width Height')
 Result = namedtuple('Result', 'Name Score Time')
 
+
+
+#
+# assignment 6 teils hilfe von chatgpt
+#
+
 Numpoints = 64
 Phi = 0.5 * (-1.0 + math.sqrt(5.0))
 SquareSize = 250.0
@@ -26,7 +32,7 @@ AnglePrecision = math.radians(2.0) / 180
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 gesture_name = "a"  # Initial gesture name
-xml_filepath = 'xml_logs_pro'
+xml_filepath = 'xml_logs2'
 
 # Helper functions for gesture recognition
 def PathLength(points):
