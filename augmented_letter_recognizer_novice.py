@@ -152,7 +152,7 @@ class LetterDrawer(QMainWindow):
         
         # Initialize drawing state
         self.lastPoint = None
-        self.pen = QPen(Qt.GlobalColor.black, 5, Qt.PenStyle.SolidLine)
+        self.pen = QPen(Qt.GlobalColor.green, 5, Qt.PenStyle.SolidLine)
 
     def startLongRunning(self):
         # Setup the thread and worker
